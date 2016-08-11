@@ -10,7 +10,7 @@ using asio::ip::address;
 
 struct rate_controller
 {
-	static constexpr int threshold = 512;
+    static constexpr int threshold = 512;
 
     uint64_t pcr;
     int bytes_sent;
@@ -26,8 +26,8 @@ struct rate_controller
         bytes_sent += ts_packet::size;
 
         if (bytes_sent / 1024 > threshold
-			&& packet.has_adaptation_field() 
-			&& packet.adaptation_field.has_pcr)
+            && packet.has_adaptation_field()
+            && packet.adaptation_field.has_pcr)
         {
             if (pcr == 0)
                 pcr = packet.adaptation_field.pcr;
@@ -71,9 +71,9 @@ private:
 
 public:
     udp_streamer();
-	udp_streamer(ts_stream& stream);
+    udp_streamer(ts_stream& stream);
     udp_streamer(std::string ip_address, short port);
-	~udp_streamer();
+    ~udp_streamer();
     udp_streamer(const udp_streamer& other) = delete;
     udp_streamer(udp_streamer&& other) = default;
     udp_streamer& operator=(const udp_streamer& other) = delete;
@@ -82,5 +82,5 @@ public:
     void set_receiver(std::string& ip_address, std::string& port, udp protocol = udp::v4());
     void set_receiver(std::string&& ip_address, std::string&& port, udp protocol = udp::v4());
     void start(std::string filename);
-	void start();
+    void start();
 };

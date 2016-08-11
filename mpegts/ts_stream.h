@@ -25,45 +25,45 @@ struct pat_t
     dvbpsi_t* handle;
     bool attached;
 
-	pat_t(ts_stream* stream)
-		: handle(nullptr)
-		, attached(false)
-	{
-		handle = dvbpsi_new(NULL, DVBPSI_MSG_NONE);
+    pat_t(ts_stream* stream)
+        : handle(nullptr)
+        , attached(false)
+    {
+        handle = dvbpsi_new(NULL, DVBPSI_MSG_NONE);
 
-		if (handle)
-			attached = dvbpsi_pat_attach(handle, dump_pat, stream);
-	}
+        if (handle)
+            attached = dvbpsi_pat_attach(handle, dump_pat, stream);
+    }
 
-	~pat_t()
-	{
-		if (attached)
-			dvbpsi_pat_detach(handle);
+    ~pat_t()
+    {
+        if (attached)
+            dvbpsi_pat_detach(handle);
 
-		if (handle)
-			dvbpsi_delete(handle);
-	}
+        if (handle)
+            dvbpsi_delete(handle);
+    }
 
-	pat_t(const pat_t& other) = delete;
-	pat_t(pat_t&& other)
-		: handle(std::move(other.handle))
-		, attached(std::move(other.attached))
-	{
-		other.handle = nullptr;
-		other.attached = false;
-	}
+    pat_t(const pat_t& other) = delete;
+    pat_t(pat_t&& other)
+        : handle(std::move(other.handle))
+        , attached(std::move(other.attached))
+    {
+        other.handle = nullptr;
+        other.attached = false;
+    }
 
-	pat_t& operator=(const pat_t& other) = delete;
-	pat_t& operator=(pat_t&& other)
-	{
-		handle = std::move(other.handle);
-		attached = std::move(other.attached);
+    pat_t& operator=(const pat_t& other) = delete;
+    pat_t& operator=(pat_t&& other)
+    {
+        handle = std::move(other.handle);
+        attached = std::move(other.attached);
 
-		other.handle = nullptr;
-		other.attached = false;
+        other.handle = nullptr;
+        other.attached = false;
 
-		return *this;
-	}
+        return *this;
+    }
 };
 
 struct pmt_t
@@ -71,50 +71,50 @@ struct pmt_t
     dvbpsi_t* handle = nullptr;
     bool attached = false;
 
-	pmt_t()
-		: handle(nullptr)
-		, attached(false)
-	{
-	}
+    pmt_t()
+        : handle(nullptr)
+        , attached(false)
+    {
+    }
 
-	pmt_t(ts_stream* stream, int program_number)
-		: pmt_t()
-	{
-		handle = dvbpsi_new(NULL, DVBPSI_MSG_NONE);
+    pmt_t(ts_stream* stream, int program_number)
+        : pmt_t()
+    {
+        handle = dvbpsi_new(NULL, DVBPSI_MSG_NONE);
 
-		if (handle)
-			attached = dvbpsi_pmt_attach(handle, program_number, dump_pmt, stream);
-	}
+        if (handle)
+            attached = dvbpsi_pmt_attach(handle, program_number, dump_pmt, stream);
+    }
 
-	~pmt_t()
-	{
-		if (attached)
-			dvbpsi_pmt_detach(handle);
+    ~pmt_t()
+    {
+        if (attached)
+            dvbpsi_pmt_detach(handle);
 
-		if (handle)
-			dvbpsi_delete(handle);
-	}
+        if (handle)
+            dvbpsi_delete(handle);
+    }
 
-	pmt_t(const pmt_t& other) = delete;
-	pmt_t(pmt_t&& other)
-		: handle(std::move(other.handle))
-		, attached(std::move(other.attached))
-	{
-		other.handle = nullptr;
-		other.attached = false;
-	}
+    pmt_t(const pmt_t& other) = delete;
+    pmt_t(pmt_t&& other)
+        : handle(std::move(other.handle))
+        , attached(std::move(other.attached))
+    {
+        other.handle = nullptr;
+        other.attached = false;
+    }
 
-	pmt_t& operator=(const pmt_t& other) = delete;
-	pmt_t& operator=(pmt_t&& other)
-	{
-		handle = std::move(other.handle);
-		attached = std::move(other.attached);
+    pmt_t& operator=(const pmt_t& other) = delete;
+    pmt_t& operator=(pmt_t&& other)
+    {
+        handle = std::move(other.handle);
+        attached = std::move(other.attached);
 
-		other.handle = nullptr;
-		other.attached = false;
+        other.handle = nullptr;
+        other.attached = false;
 
-		return *this;
-	}
+        return *this;
+    }
 };
 
 class ts_stream
@@ -125,7 +125,7 @@ private:
 
     int fd;
     pat_t pat;
-	std::map<int, pmt_t> pmt_tables;
+    std::map<int, pmt_t> pmt_tables;
 
     std::map<int, packet_fn> packet_handlers;
     packet_fn any_packet_handler;
@@ -142,7 +142,7 @@ public:
     ts_stream& operator=(const ts_stream& other) = delete;
     ts_stream& operator=(ts_stream&& other) = delete;
 
-    void on_packet(int pid, packet_fn& f); 
+    void on_packet(int pid, packet_fn& f);
     void on_packet(int pid, packet_fn&& f);
     void on_any_packet(packet_fn& f);
     void on_any_packet(packet_fn&& f);
@@ -154,8 +154,8 @@ public:
     bool is_ok();
     void start();
     void reset();
-	void show_metadata();
+    void show_metadata();
 
-	friend void dump_pat(void* data, dvbpsi_pat_t* pat);
-	friend void dump_pmt(void* data, dvbpsi_pmt_t* pmt);
+    friend void dump_pat(void* data, dvbpsi_pat_t* pat);
+    friend void dump_pmt(void* data, dvbpsi_pmt_t* pmt);
 };

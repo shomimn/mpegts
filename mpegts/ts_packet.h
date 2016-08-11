@@ -7,8 +7,8 @@
 struct ts_packet
 {
     static constexpr int size = 188;
-	static constexpr int header_size = 4;
-	static constexpr int null_pid = 0x1fff;
+    static constexpr int header_size = 4;
+    static constexpr int null_pid = 0x1fff;
 
     std::array<uint8_t, size> data;
     uint8_t sync_byte;
@@ -38,7 +38,7 @@ struct ts_packet
     bool is_null();
 
 private:
-	void parse_header();
-	void parse_adaptation_field();
-	void parse_payload(const int& bytes_read);
+    void parse_header();
+    void parse_adaptation_field();
+    void parse_payload(const int& bytes_read);
 };

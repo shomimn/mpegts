@@ -5,7 +5,7 @@
 struct adaptation_field
 {
     using flag_ptr = bool adaptation_field::*;
-	static constexpr int max_size = 188 - 4;
+    static constexpr int max_size = 188 - 4;
 
     uint8_t length;
     bool discontinuity_indicator;
@@ -54,16 +54,16 @@ private:
         assign_flag(data, 0);
     }
 
-	template<typename F>
-	void base_init(uint8_t* data, F&& initializer)
-	{
-		length = data[4] + 1; //1 for adaptation_field_length
+    template<typename F>
+    void base_init(uint8_t* data, F&& initializer)
+    {
+        length = data[4] + 1; //1 for adaptation_field_length
 
-		initializer();
+        initializer();
 
-		if (has_pcr)
-			calculate_pcr(data);
-	}
+        if (has_pcr)
+            calculate_pcr(data);
+    }
 
     void assign_flag(uint8_t* data, int i);
     void calculate_pcr(uint8_t* data);
