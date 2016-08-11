@@ -10,12 +10,21 @@
 
 namespace command
 {
-    const std::string open = "open";
+    << << << < HEAD
+        const std::string open = "open";
     const std::string stream = "stream";
     const std::string demux = "demux";
     const std::string pcr = "pcr";
     const std::string metadata = "metadata";
     const std::string exit = "exit";
+    == == == =
+        const std::string open = "open";
+    const std::string stream = "stream";
+    const std::string demux = "demux";
+    const std::string pcr = "pcr";
+    const std::string metadata = "metadata";
+    const std::string exit = "exit";
+    >> >> >> > 6fbd6c2d19ee407e9880bf7999c1a923e97ef79b
 }
 
 std::vector<std::string> whitespace_split(std::string& line)
@@ -85,6 +94,5 @@ int main(int argc, char* argv[])
             else
                 std::cout << "can't open stream\n";
         }
-
     }
 }
