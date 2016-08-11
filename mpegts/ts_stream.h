@@ -22,8 +22,8 @@ void dump_pmt(void* data, dvbpsi_pmt_t* pmt);
 
 struct pat_t
 {
-    dvbpsi_t* handle;
-    bool attached;
+	dvbpsi_t* handle;
+	bool attached;
 
 	pat_t(ts_stream* stream)
 		: handle(nullptr)
@@ -68,8 +68,8 @@ struct pat_t
 
 struct pmt_t
 {
-    dvbpsi_t* handle = nullptr;
-    bool attached = false;
+	dvbpsi_t* handle = nullptr;
+	bool attached = false;
 
 	pmt_t()
 		: handle(nullptr)
@@ -120,40 +120,40 @@ struct pmt_t
 class ts_stream
 {
 private:
-    using packet_fn = std::function<void(ts_packet&)>;
-    using nullary_fn = std::function<void()>;
+	using packet_fn = std::function<void(ts_packet&)>;
+	using nullary_fn = std::function<void()>;
 
-    int fd;
-    pat_t pat;
+	int fd;
+	pat_t pat;
 	std::map<int, pmt_t> pmt_tables;
 
-    std::map<int, packet_fn> packet_handlers;
-    packet_fn any_packet_handler;
-    nullary_fn start_handler;
-    nullary_fn end_handler;
+	std::map<int, packet_fn> packet_handlers;
+	packet_fn any_packet_handler;
+	nullary_fn start_handler;
+	nullary_fn end_handler;
 
-    int read(ts_packet& packet);
+	int read(ts_packet& packet);
 
 public:
-    ts_stream();
-    ~ts_stream();
-    ts_stream(const ts_stream& other) = delete;
-    ts_stream(ts_stream&& other) = delete;
-    ts_stream& operator=(const ts_stream& other) = delete;
-    ts_stream& operator=(ts_stream&& other) = delete;
+	ts_stream();
+	~ts_stream();
+	ts_stream(const ts_stream& other) = delete;
+	ts_stream(ts_stream&& other) = delete;
+	ts_stream& operator=(const ts_stream& other) = delete;
+	ts_stream& operator=(ts_stream&& other) = delete;
 
-    void on_packet(int pid, packet_fn& f); 
-    void on_packet(int pid, packet_fn&& f);
-    void on_any_packet(packet_fn& f);
-    void on_any_packet(packet_fn&& f);
-    void on_start(nullary_fn& f);
-    void on_start(nullary_fn&& f);
-    void on_end(nullary_fn& f);
-    void on_end(nullary_fn&& f);
-    void open(std::string filename);
-    bool is_ok();
-    void start();
-    void reset();
+	void on_packet(int pid, packet_fn& f);
+	void on_packet(int pid, packet_fn&& f);
+	void on_any_packet(packet_fn& f);
+	void on_any_packet(packet_fn&& f);
+	void on_start(nullary_fn& f);
+	void on_start(nullary_fn&& f);
+	void on_end(nullary_fn& f);
+	void on_end(nullary_fn&& f);
+	void open(std::string filename);
+	bool is_ok();
+	void start();
+	void reset();
 	void show_metadata();
 
 	friend void dump_pat(void* data, dvbpsi_pat_t* pat);

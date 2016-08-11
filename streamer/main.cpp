@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 
 	ts_stream stream;
 	stream.open(argv[1]);
-	
+
 	if (stream.is_ok())
 	{
 		udp_streamer streamer(stream);

@@ -1,8 +1,8 @@
 #include "udp_streamer.h"
 
 udp_streamer::udp_streamer()
-    : socket(io_service, udp::endpoint(udp::v4(), 12346))
-    , resolver(io_service)
+	: socket(io_service, udp::endpoint(udp::v4(), 12346))
+	, resolver(io_service)
 	, stream(ts_stream())
 {
 }
@@ -23,27 +23,27 @@ udp_streamer::udp_streamer(std::string ip_address, short port)
 
 udp_streamer::~udp_streamer()
 {
-    socket.shutdown(udp::socket::shutdown_both);
-    socket.close();
+	socket.shutdown(udp::socket::shutdown_both);
+	socket.close();
 }
 
 void udp_streamer::set_receiver(std::string& ip_address, std::string& port, udp protocol)
 {
-    udp::resolver::query query(protocol, ip_address, port);
-    endpoint = *resolver.resolve(query);
+	udp::resolver::query query(protocol, ip_address, port);
+	endpoint = *resolver.resolve(query);
 }
 
 void udp_streamer::set_receiver(std::string&& ip_address, std::string&& port, udp protocol)
 {
-    udp::resolver::query query(std::move(protocol), 
-        std::move(ip_address), std::move(port));
+	udp::resolver::query query(std::move(protocol),
+		std::move(ip_address), std::move(port));
 
-    endpoint = *resolver.resolve(query);
+	endpoint = *resolver.resolve(query);
 }
 
 void udp_streamer::start(std::string filename)
 {
-    stream.open(filename);
+	stream.open(filename);
 	start();
 }
 
@@ -73,7 +73,7 @@ void udp_streamer::start()
 				packet_counter = 0;
 
 				//s.send_to(buffer, receiver_endpoint);
-				socket.async_send_to(buffer, endpoint, 
+				socket.async_send_to(buffer, endpoint,
 					[](auto& error_code, auto& bytes) {});
 			}
 		});

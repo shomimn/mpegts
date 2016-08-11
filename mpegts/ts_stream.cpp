@@ -16,61 +16,61 @@ ts_stream::ts_stream()
 }
 
 ts_stream::~ts_stream()
-{   
-    if (fd > -1)
-        _close(fd);
+{
+	if (fd > -1)
+		_close(fd);
 }
 
 int ts_stream::read(ts_packet& packet)
 {
-    int count = _read(fd, &packet.data[0], 1);
-    while (packet.data[0] != 0x47 && count > 0)
-        count = _read(fd, &packet.data[0], 1);
+	int count = _read(fd, &packet.data[0], 1);
+	while (packet.data[0] != 0x47 && count > 0)
+		count = _read(fd, &packet.data[0], 1);
 
-    count += _read(fd, &packet.data[1], 187);
-    packet.init(count);
+	count += _read(fd, &packet.data[1], 187);
+	packet.init(count);
 
-    return count;
+	return count;
 }
 
 void ts_stream::on_packet(int pid, packet_fn& f)
 {
-    packet_handlers.insert({ pid, f });
+	packet_handlers.insert({ pid, f });
 }
 
 void ts_stream::on_packet(int pid, packet_fn&& f)
 {
-    packet_handlers.insert({ pid, std::move(f) });
+	packet_handlers.insert({ pid, std::move(f) });
 }
 
 void ts_stream::on_any_packet(packet_fn& f)
 {
-    any_packet_handler = f;
+	any_packet_handler = f;
 }
 
 void ts_stream::on_any_packet(packet_fn&& f)
 {
-    any_packet_handler = std::move(f);
+	any_packet_handler = std::move(f);
 }
 
 void ts_stream::on_start(nullary_fn& f)
 {
-    start_handler = f;
+	start_handler = f;
 }
 
 void ts_stream::on_start(nullary_fn&& f)
 {
-    start_handler = std::move(f);
+	start_handler = std::move(f);
 }
 
 void ts_stream::on_end(nullary_fn& f)
 {
-    end_handler = f;
+	end_handler = f;
 }
 
 void ts_stream::on_end(nullary_fn&& f)
 {
-    end_handler = std::move(f);
+	end_handler = std::move(f);
 }
 
 void ts_stream::open(std::string filename)
@@ -78,58 +78,58 @@ void ts_stream::open(std::string filename)
 	if (fd > -1)
 		_close(fd);
 
-    fd = _open(filename.data(), _O_BINARY);
+	fd = _open(filename.data(), _O_BINARY);
 }
 
 bool ts_stream::is_ok()
 {
-    return (fd > -1) && pat.attached;
+	return (fd > -1) && pat.attached;
 }
 
 void ts_stream::start()
 {
-    int len = 0;
-    if (pat.attached)
-    {
-        int i = 1;
-        ts_packet ts_packet;
+	int len = 0;
+	if (pat.attached)
+	{
+		int i = 1;
+		ts_packet ts_packet;
 
-        if (start_handler)
-            start_handler();
+		if (start_handler)
+			start_handler();
 
-        len = read(ts_packet);
-        while (len > 0)
-        {
-            if (ts_packet.should_discard)
-            {
-                len = read(ts_packet);
-                continue;
-            }
+		len = read(ts_packet);
+		while (len > 0)
+		{
+			if (ts_packet.should_discard)
+			{
+				len = read(ts_packet);
+				continue;
+			}
 
-            if (i % 1000 == 0)
-                printf("packet %d\n", i);
+			if (i % 1000 == 0)
+				printf("packet %d\n", i);
 
-            if (any_packet_handler)
-                any_packet_handler(ts_packet);
+			if (any_packet_handler)
+				any_packet_handler(ts_packet);
 
-            if (!ts_packet.is_null())
-            {
-                if (packet_handlers.count(ts_packet.pid))
-                    packet_handlers[ts_packet.pid](ts_packet);
-            }
+			if (!ts_packet.is_null())
+			{
+				if (packet_handlers.count(ts_packet.pid))
+					packet_handlers[ts_packet.pid](ts_packet);
+			}
 
-            len = read(ts_packet);
-            ++i;
-        }
+			len = read(ts_packet);
+			++i;
+		}
 
-        if (end_handler)
-            end_handler();
-    }
+		if (end_handler)
+			end_handler();
+	}
 }
 
 void ts_stream::reset()
 {
-    _lseek(fd, 0, SEEK_SET);
+	_lseek(fd, 0, SEEK_SET);
 }
 
 void ts_stream::show_metadata()
@@ -278,25 +278,25 @@ void dump_descriptors(const char* str, dvbpsi_descriptor_t* p_descriptor)
 
 void dump_pmt(void* data, dvbpsi_pmt_t* pmt)
 {
-    dvbpsi_pmt_es_t* p_es = pmt->p_first_es;
-    ts_stream* stream = static_cast<ts_stream*>(data);
+	dvbpsi_pmt_es_t* p_es = pmt->p_first_es;
+	ts_stream* stream = static_cast<ts_stream*>(data);
 
-    printf("\n");
-    printf("New active PMT\n");
-    printf("  program_number : %d\n",
-        pmt->i_program_number);
-    printf("  version_number : %d\n",
-        pmt->i_version);
-    printf("  PCR_PID        : 0x%x (%d)\n",
-        pmt->i_pcr_pid, pmt->i_pcr_pid);
-    printf("    | type @ elementary_PID\n");
-    while (p_es)
-    {
-        printf("    | 0x%02x (%s) @ 0x%x (%d)\n",
-            p_es->i_type, type_name(p_es->i_type),
-            p_es->i_pid, p_es->i_pid);
-        //dump_descriptors("    |  ]", p_es->p_first_descriptor);
-        p_es = p_es->p_next;
-    }
-    dvbpsi_pmt_delete(pmt);
+	printf("\n");
+	printf("New active PMT\n");
+	printf("  program_number : %d\n",
+		pmt->i_program_number);
+	printf("  version_number : %d\n",
+		pmt->i_version);
+	printf("  PCR_PID        : 0x%x (%d)\n",
+		pmt->i_pcr_pid, pmt->i_pcr_pid);
+	printf("    | type @ elementary_PID\n");
+	while (p_es)
+	{
+		printf("    | 0x%02x (%s) @ 0x%x (%d)\n",
+			p_es->i_type, type_name(p_es->i_type),
+			p_es->i_pid, p_es->i_pid);
+		//dump_descriptors("    |  ]", p_es->p_first_descriptor);
+		p_es = p_es->p_next;
+	}
+	dvbpsi_pmt_delete(pmt);
 }

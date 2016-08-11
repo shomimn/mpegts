@@ -16,7 +16,7 @@ namespace command
 	const std::string pcr = "pcr";
 	const std::string metadata = "metadata";
 	const std::string exit = "exit";
-} 
+}
 
 std::vector<std::string> whitespace_split(std::string& line)
 {
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 		{
 			ts_stream stream;
 			stream.open(tokens[1]);
-			
+
 			if (stream.is_ok())
 				stream.show_metadata();
 			else

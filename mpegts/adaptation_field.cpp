@@ -1,7 +1,7 @@
 #include "adaptation_field.h"
 
 adaptation_field::adaptation_field()
-    : length(0)
+	: length(0)
 {
 }
 
@@ -39,17 +39,17 @@ void adaptation_field::init_unroll(uint8_t* data)
 
 void adaptation_field::assign_flag(uint8_t* data, int i)
 {
-    this->*flags[i] = (data[5] & (0x80 >> i));
+	this->*flags[i] = (data[5] & (0x80 >> i));
 }
 
 void adaptation_field::calculate_pcr(uint8_t* data)
 {
-    pcr = data[6] << 25;
-    pcr |= data[7] << 17;
-    pcr |= data[8] << 9;
-    pcr |= data[9] << 1;
-    pcr |= data[10] >> 7;
+	pcr = data[6] << 25;
+	pcr |= data[7] << 17;
+	pcr |= data[8] << 9;
+	pcr |= data[9] << 1;
+	pcr |= data[10] >> 7;
 
-    //pcr *= 300;
-    //calculate and add extension if necessary
+	//pcr *= 300;
+	//calculate and add extension if necessary
 }

@@ -2,13 +2,13 @@
 #include "pes_packet.h"
 
 ts_packet::ts_packet()
-    : should_discard(false)
+	: should_discard(false)
 {
 }
 
 void ts_packet::init(int bytes_read)
 {
-    should_discard = false;
+	should_discard = false;
 
 	parse_header();
 	parse_adaptation_field();
@@ -23,17 +23,17 @@ void ts_packet::init(int bytes_read)
 
 bool ts_packet::has_adaptation_field()
 {
-    return (adaptation_field_ctrl & 0x20);
+	return (adaptation_field_ctrl & 0x20);
 }
 
 bool ts_packet::has_data()
 {
-    return (adaptation_field_ctrl & 0x10);
+	return (adaptation_field_ctrl & 0x10);
 }
 
 bool ts_packet::is_null()
 {
-    return pid == null_pid;
+	return pid == null_pid;
 }
 
 void ts_packet::parse_header()
