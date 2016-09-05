@@ -17,7 +17,7 @@ udp_streamer::udp_streamer(ts_stream& stream)
 udp_streamer::udp_streamer(std::string ip_address, short port)
     : socket(io_service, udp::endpoint(address::from_string(ip_address), port))
     , resolver(io_service)
-    , stream(stream)
+    , stream(ts_stream())
 {
 }
 

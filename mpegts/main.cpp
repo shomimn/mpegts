@@ -69,6 +69,9 @@ int main(int argc, char* argv[])
 
         tokens = whitespace_split(line);
 
+        if (tokens.size() == 0)
+            continue;
+
         if (tokens[0] == command::demux)
             start_process("demuxer.exe", tokens[1], tokens[2], tokens[3]);
         else if (tokens[0] == command::stream)

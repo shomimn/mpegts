@@ -24,6 +24,7 @@ struct ts_packet
     uint8_t payload_length;
     uint16_t pes_packet_length;
     uint8_t pes_header_length;
+    bool pes_start;
     bool should_discard;
 
     ts_packet();

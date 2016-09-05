@@ -1,4 +1,5 @@
 #include "ts_stream.h"
+#include "pes_packet.h"
 
 extern "C"
 {
@@ -41,6 +42,22 @@ void ts_stream::on_packet(int pid, packet_fn& f)
 void ts_stream::on_packet(int pid, packet_fn&& f)
 {
     packet_handlers.insert({ pid, std::move(f) });
+}
+
+void ts_stream::on_pes(int pid, pes_fn& f)
+{
+    std::vector<uint8_t> buffer;
+    buffer.reserve(10 * pes_packet::max_size);
+
+    pes_handlers.insert({ pid, { std::move(buffer), f } });
+}
+
+void ts_stream::on_pes(int pid, pes_fn&& f)
+{
+    std::vector<uint8_t> buffer;
+    buffer.reserve(10 * pes_packet::max_size);
+
+    pes_handlers.insert({ pid, { std::move(buffer), std::move(f) } });
 }
 
 void ts_stream::on_any_packet(packet_fn& f)
@@ -116,6 +133,22 @@ void ts_stream::start()
             {
                 if (packet_handlers.count(ts_packet.pid))
                     packet_handlers[ts_packet.pid](ts_packet);
+
+                bool has_pes_handler = pes_handlers.count(ts_packet.pid) > 0;
+
+                if (has_pes_handler)
+                {
+                    auto& buffer = pes_handlers[ts_packet.pid].first;
+                    int offset = ts_packet::header_size + ts_packet.adaptation_field.length;
+
+                    if (ts_packet.pes_start && buffer.size() > 0)
+                    {
+                        pes_handlers[ts_packet.pid].second(buffer);
+                        buffer.clear();
+                    }
+                 
+                    std::copy(ts_packet.data.begin() + offset, ts_packet.data.end(), std::back_inserter(buffer));
+                }
             }
 
             len = read(ts_packet);

@@ -3,12 +3,14 @@
 
 ts_packet::ts_packet()
     : should_discard(false)
+    , pes_start(false)
 {
 }
 
 void ts_packet::init(int bytes_read)
 {
     should_discard = false;
+    pes_start = false;
 
     parse_header();
     parse_adaptation_field();
@@ -74,6 +76,8 @@ void ts_packet::parse_payload(const int& bytes_read)
 
         if (start_code == pes_packet::start_code)
         {
+            pes_start = true;
+
             pes_packet_length = data[start + 4] << 8;
             pes_packet_length |= data[start + 5];
             pes_packet_length += pes_packet::header_size; //6 bytes before and including the length field
