@@ -1,9 +1,15 @@
 #include "ts_packet.h"
 #include "pes_packet.h"
 
+bool invalid_adaptation_length(ts_packet* packet, const int& bytes_read)
+{
+    return packet->adaptation_field.length > bytes_read - ts_packet::header_size;
+}
+
 ts_packet::ts_packet()
     : should_discard(false)
     , pes_start(false)
+    , discard_criteria({ &invalid_adaptation_length })
 {
 }
 
@@ -11,11 +17,15 @@ void ts_packet::init(int bytes_read)
 {
     should_discard = false;
     pes_start = false;
+    has_pts = false;
+    has_dts = false;
 
     parse_header();
     parse_adaptation_field();
 
-    should_discard |= [&]() { return adaptation_field.length > bytes_read - header_size; }();
+    should_discard = std::any_of(
+        discard_criteria.begin(), discard_criteria.end(),
+        [&](auto& pred) { return pred(this, bytes_read); });
 
     if (should_discard)
         return;
@@ -82,12 +92,32 @@ void ts_packet::parse_payload(const int& bytes_read)
             pes_packet_length |= data[start + 5];
             pes_packet_length += pes_packet::header_size; //6 bytes before and including the length field
 
+            has_pts = data[start + 7] & 0x80;
+            has_dts = has_pts && data[start + 7] & 0x40;
+
             pes_header_length = data[start + 8];
 
             int payload_offset = pes_packet::header_size + pes_packet::optional_header_size + pes_header_length;
 
             payload += payload_offset;
             payload_length -= payload_offset;
+
+            if (has_pts)
+                pts = parse_timestamp(&data[start + 9]);
+
+            if (has_dts)
+                dts = parse_timestamp(&data[start + 14]);
         }
     }
+}
+
+uint64_t ts_packet::parse_timestamp(uint8_t* from)
+{
+    uint64_t ts = (from[0] & 0x0e) << 29;
+    ts |= from[1] << 22;
+    ts |= (from[2] & 0xfe) << 14;   
+    ts |= from[3] << 7;
+    ts |= from[4] >> 1;
+
+    return ts;
 }

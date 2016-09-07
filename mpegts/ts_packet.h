@@ -2,10 +2,13 @@
 
 #include <cstdint>
 #include <array>
+#include <vector>
 #include "adaptation_field.h";
 
 struct ts_packet
 {
+    using discard_pred = bool(*)(ts_packet*, const int&);
+
     static constexpr int size = 188;
     static constexpr int header_size = 4;
     static constexpr int null_pid = 0x1fff;
@@ -26,6 +29,10 @@ struct ts_packet
     uint8_t pes_header_length;
     bool pes_start;
     bool should_discard;
+    uint64_t pts;
+    uint64_t dts;
+
+    std::vector<discard_pred> discard_criteria;
 
     ts_packet();
     ts_packet(const ts_packet& other) = default;
@@ -42,4 +49,7 @@ private:
     void parse_header();
     void parse_adaptation_field();
     void parse_payload(const int& bytes_read);
+    uint64_t parse_timestamp(uint8_t* from);
 };
+
+bool invalid_adaptation_length(ts_packet* packet, const int& bytes_read);
