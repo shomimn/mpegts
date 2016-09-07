@@ -29,6 +29,8 @@ struct ts_packet
     uint8_t pes_header_length;
     bool pes_start;
     bool should_discard;
+    bool has_pts;
+    bool has_dts;
     uint64_t pts;
     uint64_t dts;
 
