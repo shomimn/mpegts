@@ -1,5 +1,6 @@
 #include "ts_packet.h"
 #include "pes_packet.h"
+#include "util.h"
 
 bool invalid_adaptation_length(ts_packet* packet, const int& bytes_read)
 {
@@ -15,10 +16,12 @@ ts_packet::ts_packet()
 
 void ts_packet::init(int bytes_read)
 {
-    should_discard = false;
-    pes_start = false;
-    has_pts = false;
-    has_dts = false;
+    reset_flags(
+        should_discard, 
+        pes_start, 
+        has_pts, 
+        has_dts
+    );
 
     parse_header();
     parse_adaptation_field();
