@@ -125,19 +125,20 @@ private:
     using pes_fn = std::function<void(std::vector<uint8_t>&)>;
     using nullary_fn = std::function<void()>;
 
-    using pes_pair = std::pair<std::vector<uint8_t>, pes_fn>;
+    using pes_data = std::tuple<bool, std::vector<uint8_t>, pes_fn>;
 
     int fd;
     pat_t pat;
     std::map<int, pmt_t> pmt_tables;
 
     std::map<int, packet_fn> packet_handlers;
-    std::map<int, pes_pair> pes_handlers;
+    std::map<int, pes_data> pes_handlers;
     packet_fn any_packet_handler;
     nullary_fn start_handler;
     nullary_fn end_handler;
 
     int read(ts_packet& packet);
+    void collect(ts_packet& packet);
 
 public:
     ts_stream();

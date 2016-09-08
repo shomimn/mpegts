@@ -49,7 +49,7 @@ void ts_stream::on_pes(int pid, pes_fn& f)
     std::vector<uint8_t> buffer;
     buffer.reserve(10 * pes_packet::max_size);
 
-    pes_handlers.insert({ pid, { std::move(buffer), f } });
+    pes_handlers.insert({ pid, { false, std::move(buffer), f } });
 }
 
 void ts_stream::on_pes(int pid, pes_fn&& f)
@@ -57,7 +57,7 @@ void ts_stream::on_pes(int pid, pes_fn&& f)
     std::vector<uint8_t> buffer;
     buffer.reserve(10 * pes_packet::max_size);
 
-    pes_handlers.insert({ pid, { std::move(buffer), std::move(f) } });
+    pes_handlers.insert({ pid, { false, std::move(buffer), std::move(f) } });
 }
 
 void ts_stream::on_any_packet(packet_fn& f)
@@ -137,18 +137,7 @@ void ts_stream::start()
                 bool has_pes_handler = pes_handlers.count(ts_packet.pid) > 0;
 
                 if (has_pes_handler)
-                {
-                    auto& buffer = pes_handlers[ts_packet.pid].first;
-                    int offset = ts_packet::header_size + ts_packet.adaptation_field.length;
-
-                    if (ts_packet.pes_start && buffer.size() > 0)
-                    {
-                        pes_handlers[ts_packet.pid].second(buffer);
-                        buffer.clear();
-                    }
-                 
-                    std::copy(ts_packet.data.begin() + offset, ts_packet.data.end(), std::back_inserter(buffer));
-                }
+                    collect(ts_packet);
             }
 
             len = read(ts_packet);
@@ -158,6 +147,28 @@ void ts_stream::start()
         if (end_handler)
             end_handler();
     }
+}
+
+void ts_stream::collect(ts_packet& packet)
+{
+    auto& tuple = pes_handlers[packet.pid];
+
+    bool& collecting = std::get<0>(tuple);
+    auto& buffer = std::get<1>(tuple);
+    auto& handler = std::get<2>(tuple);
+    int offset = ts_packet::header_size + packet.adaptation_field.length;
+
+    if (packet.pes_start)
+        collecting = true;
+
+    if (packet.pes_start && buffer.size() > 0)
+    {
+        handler(buffer);
+        buffer.clear();
+    }
+
+    if (collecting)
+        std::copy(packet.data.begin() + offset, packet.data.end(), std::back_inserter(buffer));
 }
 
 void ts_stream::reset()
